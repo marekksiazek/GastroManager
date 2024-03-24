@@ -1,9 +1,9 @@
-package org.acme.repository;
+package pl.marekksiazek.repository;
 
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import org.acme.entity.Company;
+import pl.marekksiazek.entity.Company;
 
 @ApplicationScoped
 public class CompanyRepository implements PanacheRepository<Company> {

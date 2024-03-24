@@ -1,12 +1,12 @@
-package org.acme.conrollers;
+package pl.marekksiazek.conrollers;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.acme.entity.Company;
-import org.acme.repository.CompanyRepository;
+import pl.marekksiazek.entity.Company;
+import pl.marekksiazek.repository.CompanyRepository;
 
 import java.net.URI;
 import java.util.List;
