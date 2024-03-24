@@ -5,18 +5,20 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name="company")
+@Schema(name = "Company", description = "Company representation")
 public class Company{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Schema(required = true)
     @Column(name="nip")
     private String nip;
 
