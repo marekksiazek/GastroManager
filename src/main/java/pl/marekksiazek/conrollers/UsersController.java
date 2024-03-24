@@ -11,7 +11,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import pl.marekksiazek.entity.Company;
 import pl.marekksiazek.entity.User;
 import pl.marekksiazek.repository.UsersRepository;
 

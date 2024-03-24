@@ -1,5 +1,7 @@
 package pl.marekksiazek.conrollers;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -31,6 +33,7 @@ public class CompanyController {
     CompanyRepository companyRepository;
 
     @GET
+    @PermitAll
     @Operation(
             operationId = "getCompanies",
             summary = "Get Company",
@@ -47,6 +50,7 @@ public class CompanyController {
     }
 
     @GET
+    @PermitAll
     @Path("{id}")
     @Operation(
             operationId = "getCompany",
@@ -65,6 +69,7 @@ public class CompanyController {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     @Operation(
             operationId = "createCompany",
             summary = "Create a new Company in DB",
