@@ -1,21 +1,30 @@
 package pl.marekksiazek.conrollers;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.openapi.annotations.security.SecuritySchemes;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import pl.marekksiazek.entity.Company;
 import pl.marekksiazek.entity.User;
+import pl.marekksiazek.repository.CompanyRepository;
 import pl.marekksiazek.repository.UsersRepository;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
@@ -24,12 +33,18 @@ import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 @Tag(name = "Users Controller", description = "Users REST API")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@SecuritySchemes(value = {
+        @SecurityScheme(securitySchemeName = "apiKey",
+                type = SecuritySchemeType.HTTP,
+                scheme = "Bearer"
+        )})
 public class UsersController {
 
     @Inject
     UsersRepository usersRepository;
 
     @GET
+    @PermitAll
     @Operation(
             operationId = "getUsers",
             summary = "Get Users list",
@@ -46,7 +61,9 @@ public class UsersController {
     }
 
     @GET
+    @SecurityRequirement(name = "apiKey")
     @Path("{id}")
+    @RolesAllowed("ADMIN")
     @Operation(
             operationId = "getUserById",
             summary = "Get user by ID",
@@ -64,6 +81,8 @@ public class UsersController {
     }
 
     @POST
+    @SecurityRequirement(name = "apiKey")
+    @RolesAllowed("ADMIN")
     @Operation(
             operationId = "createUser",
             summary = "Create a new User in DB",
@@ -83,6 +102,7 @@ public class UsersController {
             )User user){
         usersRepository.persist(user);
         if (usersRepository.isPersistent(user)){
+
             return Response.created(URI.create("/users/" + user.getId())).build();
         }
         return Response.status(BAD_REQUEST).build();
@@ -90,7 +110,9 @@ public class UsersController {
 
 
     @DELETE
+    @SecurityRequirement(name = "apiKey")
     @Path("{id}")
+    @RolesAllowed("OWNER")
     @Transactional
     @Operation(
             operationId = "deleteUser",

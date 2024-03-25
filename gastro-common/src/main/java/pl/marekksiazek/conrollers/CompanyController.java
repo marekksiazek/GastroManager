@@ -7,13 +7,19 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.openapi.annotations.security.SecuritySchemes;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import pl.marekksiazek.entity.Company;
+import pl.marekksiazek.entity.User;
 import pl.marekksiazek.repository.CompanyRepository;
 
 import java.net.URI;
@@ -22,11 +28,15 @@ import java.util.List;
 import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 
-
 @Path("/companies")
 @Tag(name = "Company Controller", description = "Company REST API")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@SecuritySchemes(value = {
+        @SecurityScheme(securitySchemeName = "apiKey",
+        type = SecuritySchemeType.HTTP,
+        scheme = "Bearer"
+        )})
 public class CompanyController {
 
     @Inject
@@ -50,7 +60,8 @@ public class CompanyController {
     }
 
     @GET
-    @PermitAll
+    @SecurityRequirement(name = "apiKey")
+    @RolesAllowed("ADMIN")
     @Path("{id}")
     @Operation(
             operationId = "getCompany",
@@ -69,6 +80,7 @@ public class CompanyController {
     }
 
     @POST
+    @SecurityRequirement(name = "apiKey")
     @RolesAllowed("ADMIN")
     @Operation(
             operationId = "createCompany",
@@ -97,6 +109,8 @@ public class CompanyController {
 
     @DELETE
     @Path("{id}")
+    @SecurityRequirement(name = "apiKey")
+    @RolesAllowed("OWNER")
     @Transactional
     @Operation(
             operationId = "deleteCompany",

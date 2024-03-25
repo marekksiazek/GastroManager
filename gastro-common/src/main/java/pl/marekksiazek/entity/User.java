@@ -41,6 +41,10 @@ public class User {
     @Column(name = "role")
     private UserRoleEnum role;
 
+    @Column(name = "company_id")
+    private Long companyId;
+
+
     public Long getId() {
         return user_id;
     }
