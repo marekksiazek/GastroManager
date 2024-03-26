@@ -1,4 +1,4 @@
-package pl.marekksiazek.conrollers;
+package pl.marekksiazek.resources;
 
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -18,120 +18,123 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 import org.eclipse.microprofile.openapi.annotations.security.SecuritySchemes;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import pl.marekksiazek.entity.Company;
-import pl.marekksiazek.entity.User;
 import pl.marekksiazek.repository.CompanyRepository;
-import pl.marekksiazek.repository.UsersRepository;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 
-@Path("/users")
-@Tag(name = "Users Controller", description = "Users REST API")
+@Path("/companies")
+@Tag(name = "Company Controller", description = "Company REST API")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @SecuritySchemes(value = {
         @SecurityScheme(securitySchemeName = "apiKey",
-                type = SecuritySchemeType.HTTP,
-                scheme = "Bearer"
+        type = SecuritySchemeType.HTTP,
+        scheme = "Bearer"
         )})
-public class UsersController {
+public class CompanyResources {
 
     @Inject
-    UsersRepository usersRepository;
+    CompanyRepository companyRepository;
 
     @GET
     @PermitAll
     @Operation(
-            operationId = "getUsers",
-            summary = "Get Users list",
-            description = "Get all users from DB"
+            operationId = "getCompanies",
+            summary = "Get Company",
+            description = "Get all companies in DB"
     )
     @APIResponse(
             responseCode = "200",
             description = "Operation completed",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
+    @APIResponse(
+            responseCode = "404",
+            description = "Not found",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
     public Response getAll(){
-        List<User> users = usersRepository.listAll();
-        return Response.ok(users).build();
+        List<Company> companies = companyRepository.listAll();
+        return Response.ok(companies).build();
     }
 
     @GET
     @SecurityRequirement(name = "apiKey")
+    @RolesAllowed({"admin", "owner"})
     @Path("{id}")
-    @RolesAllowed("ADMIN")
     @Operation(
-            operationId = "getUserById",
-            summary = "Get user by ID",
-            description = "Get single user from DB"
+            operationId = "getCompany",
+            summary = "Get Company by Id",
+            description = "Get company from DB using ID"
     )
     @APIResponse(
             responseCode = "200",
             description = "Operation completed",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
-    public Response getById(@PathParam("id") Long id) {
-        return usersRepository.findByIdOptional(id)
-                .map(user -> Response.ok(user).build())
+    public Response getById(@PathParam("id") Long id){
+        return companyRepository.findByIdOptional(id)
+                .map(company -> Response.ok(company).build())
                 .orElse(Response.status(NOT_FOUND).build());
     }
 
     @POST
     @SecurityRequirement(name = "apiKey")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"admin"})
     @Operation(
-            operationId = "createUser",
-            summary = "Create a new User in DB",
-            description = "Create a new User to add to DB"
+            operationId = "createCompany",
+            summary = "Create a new Company in DB",
+            description = "Create a new Company to add to DB"
     )
     @APIResponse(
             responseCode = "201",
-            description = "User created",
+            description = "Company created",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
     @Transactional
-    public Response create(
+    public Response create (
             @RequestBody(
-                    description = "User to create",
+                    description = "Company to create",
                     required = true,
-                    content = @Content(schema = @Schema(implementation = User.class))
-            )User user){
-        usersRepository.persist(user);
-        if (usersRepository.isPersistent(user)){
-
-            return Response.created(URI.create("/users/" + user.getId())).build();
+                    content = @Content(schema = @Schema(implementation = Company.class))
+            )
+            Company company){
+        companyRepository.persist(company);
+        if (companyRepository.isPersistent(company)){
+            return Response.created(URI.create("/companies/" + company.getId())).build();
         }
         return Response.status(BAD_REQUEST).build();
     }
 
-
     @DELETE
-    @SecurityRequirement(name = "apiKey")
     @Path("{id}")
+    @SecurityRequirement(name = "apiKey")
     @RolesAllowed("OWNER")
     @Transactional
     @Operation(
-            operationId = "deleteUser",
-            summary = "Delete existing User from DB",
-            description = "Delete a User from DB"
+            operationId = "deleteCompany",
+            summary = "Delete existing Company from DB",
+            description = "Delete a Company from DB"
     )
     @APIResponse(
             responseCode = "204",
-            description = "User deleted",
+            description = "Company deleted",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
     @APIResponse(
             responseCode = "400",
-            description = "User not valid",
+            description = "Company not valid",
             content = @Content(mediaType = MediaType.APPLICATION_JSON)
     )
     public Response deleteById(@PathParam("id") Long id){
-        boolean deleted = usersRepository.deleteById(id);
+        boolean deleted = companyRepository.deleteById(id);
 
-        return Response.status(NOT_FOUND).build();
+        return deleted ? Response.noContent().build() :
+                Response.status(NOT_FOUND).build();
     }
+
 }

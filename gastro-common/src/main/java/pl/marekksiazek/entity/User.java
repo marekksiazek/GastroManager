@@ -1,13 +1,14 @@
 package pl.marekksiazek.entity;
 
 
+import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import pl.marekksiazek.enums.UserRoleEnum;
+
 
 @Getter
 @Setter
@@ -39,7 +40,7 @@ public class User {
     private String companyName;
 
     @Column(name = "role")
-    private UserRoleEnum role;
+    private String role;
 
     @Column(name = "company_id")
     private Long companyId;
@@ -48,4 +49,9 @@ public class User {
     public Long getId() {
         return user_id;
     }
+
+    public void setUserPwd(String userPwd){
+        this.userPwd = BcryptUtil.bcryptHash(userPwd);
+    }
+
 }
