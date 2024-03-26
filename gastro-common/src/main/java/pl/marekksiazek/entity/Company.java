@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -46,6 +49,9 @@ public class Company{
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "workers")
+    private String[] workers;
 
 
 }
